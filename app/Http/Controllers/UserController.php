@@ -47,7 +47,14 @@ class UserController extends Controller
     public function show(User $user): JsonResponse
     {
         $this->authorize('view', $user);
-        return response()->json($user->load('role'));
+        // Load the relationship and get the user data
+        $userData = $user->load('role')->toArray();
+
+        $userData['user_photo_url'] = $user->user_photo
+            ?asset('storage/' . $user->user_photo)
+            :null;
+
+        return response()->json($userData);
     }
 
     public function update(Request $request, User $user): JsonResponse

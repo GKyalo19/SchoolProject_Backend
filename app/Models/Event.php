@@ -20,4 +20,10 @@ class Event extends Model
         'sponsors',
         'capacity'
     ];
+
+    // Fix the relationship - remove any spaces in column names
+    public function classification()
+    {
+        return $this->belongsTo(Classification::class, 'classification_id');
+    }
 }

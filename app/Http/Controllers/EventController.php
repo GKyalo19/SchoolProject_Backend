@@ -17,34 +17,27 @@ class EventController extends Controller
     //create an Events
     public function createEvent(Request $request)
     {
-        $request->validate([
-            'classification_id'=>'required|integer|exists:classifications, id',
-            'name'=>'required',
-            'venue'=>'required',
-            'description'=>'string',
-            'startDate'=>'required|date',
-            'endDate'=>'required|date',
-            'hosts'=>'string',
-            'sponsors'=>'string',
-            'capacity'=>'integer',
+        $validated = $request->validate([
+            'classification_id' => 'required|exists:classifications,id',
+            'name' => 'required|string|max:255',
+            'venue' => 'required|string|max:255',
+            'description' => 'required|string',
+            'startDate' => 'required|date',
+            'endDate' => 'required|date|after_or_equal:startDate',
+            'hosts' => 'required|string',
+            'sponsors' => 'nullable|string',
+            'capacity' => 'required|integer|min:1'
         ]);
 
-        $event = new Event();
-        $event->classification_id = $request->classification_id;
-        $event->name = $request->name;
-        $event->venue = $request->venue;
-        $event->description = $request->description;
-        $event->startDate = $request->startDate;
-        $event->endDate = $request->endDate;
-        $event->hosts = $request->hosts;
-        $event->sponsors = $request->sponsors;
-        $event->capacity = $request->capacity;
-
-        $event->save();
-
-        $eventCheck = Event::find($event->id);
-
-        return response()->json($eventCheck);
+        try {
+            $event = Event::create($validated);
+            return response()->json($event, 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to create event',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function getEvents()
@@ -75,14 +68,14 @@ class EventController extends Controller
     {
         $request->validate([
             'classification_id'=>'required|integer|exists:classifications, id',
-            'name'=>'required',
-            'venue'=>'required',
-            'description'=>'string',
+            'name'=>'required|string|max:255',
+            'venue'=>'required|string|max:255',
+            'description'=>'string|string',
             'startDate'=>'required|date',
-            'endDate'=>'required|date',
-            'hosts'=>'string',
-            'sponsors'=>'string',
-            'capacity'=>'integer',
+            'endDate'=>'required|date|after_or_equal:startDate',
+            'hosts'=>'required|string',
+            'sponsors'=>'nullable|string',
+            'capacity'=>'required|integer',
         ]);
         try {
             $existingEvent = Event::findOrFail($id);

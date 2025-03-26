@@ -15,4 +15,9 @@ class Classification extends Model
         'category',
         'subject',
     ];
+
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
 }

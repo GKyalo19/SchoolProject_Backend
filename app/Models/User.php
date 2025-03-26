@@ -57,4 +57,9 @@ class User extends Authenticatable
             'update-users' => $this->can('update-users', $this),
         ];
     }
+
+    public function getUserPhotoUrlAttribute()
+    {
+        return $this->user_photo ? asset('storage/' . $this->user_photo) : null;
+    }
 }
